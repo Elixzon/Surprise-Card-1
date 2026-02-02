@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>For My Sister</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+body{
+  margin:0;
+  font-family:Inter,sans-serif;
+  background:#0c0a09;
+  color:#e5e5e5;
+  overflow:hidden
+}
+h1,h2,h3{font-family:"Playfair Display",serif}
+
+.step{display:none}
+.step.active{display:block}
+
+.glass{
+  background:rgba(10,10,10,.65);
+  backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.08)
+}
+
+.text-gradient{
+  background:linear-gradient(to right,#fff,#fbcfe8);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent
+}
+
+.btn{transition:.4s}
+.btn:hover{transform:scale(1.05)}
+.btn:active{transform:scale(.95)}
+
+.aurora{
+  position:fixed; inset:0;
+  background:
+    radial-gradient(circle at 20% 30%,hsla(333,70%,55%,.25),transparent 40%),
+    radial-gradient(circle at 80% 20%,hsla(210,89%,60%,.25),transparent 40%),
+    radial-gradient(circle at 50% 80%,hsla(282,82%,54%,.25),transparent 40%);
+  animation:move 16s infinite alternate;
+  z-index:-1
+}
+@keyframes move{from{transform:scale(1)}to{transform:scale(1.1)}}
+
+/* Special background */
+.special-bg{
+  background:
+    linear-gradient(rgba(0,0,0,.65),rgba(0,0,0,.65)),
+    url("images/special.jpg") center/cover no-repeat
+}
+
+/* Typing */
+.typing{white-space:pre-wrap}
+
+/* Game */
+.memory-card{
+  height:90px;
+  background:rgba(255,255,255,.08);
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:0;
+  cursor:pointer
+}
+.memory-card.revealed{
+  font-size:1.1rem;
+  background:rgba(255,255,255,.2)
+}
+
+/* Quiz */
+.quiz-option.selected{
+  background:rgba(255,255,255,.2)
+}
+
+/* Gallery animation */
+.gallery{
+  display:flex;
+  gap:12px;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory
+}
+.gallery img{
+  width:260px;
+  height:340px;
+  object-fit:cover;
+  border-radius:16px;
+  scroll-snap-align:center;
+  opacity:0;
+  transform:scale(.85) rotate(-2deg);
+  transition:all .8s ease
+}
+.gallery img.show{
+  opacity:1;
+  transform:scale(1) rotate(0deg)
+}
+</style>
+</head>
+
+<body>
+<div class="aurora"></div>
+
+<audio id="bg-music" loop>
+  <source src="sound/man%20mera.mp3" type="audio/mpeg">
+</audio>
+
+<div class="h-screen flex items-center justify-center px-4">
+<div class="max-w-2xl w-full">
+
+<!-- STEP 1 -->
+<div id="step-1" class="step active glass p-10 rounded-3xl text-center space-y-6">
+<h1 class="text-3xl text-gradient">Hey… I Wanted to Say Something</h1>
+<p>This is something I’ve carried quietly.</p>
+<button class="btn px-8 py-3 rounded-full bg-gradient-to-r from-pink-500 to-rose-600 text-white"
+onclick="startMusic();nextStep(2)">Continue</button>
+</div>
+
+<!-- STEP 2 -->
+<div id="step-2" class="step glass p-10 rounded-3xl text-center space-y-6">
+<h2 class="text-3xl text-gradient">You Chose Me as Your Brother</h2>
+<p>And that choice meant more than you know.</p>
+<button class="btn px-8 py-3 rounded-full bg-gradient-to-r from-pink-500 to-rose-600 text-white"
+onclick="nextStep(3)">There’s More</button>
+</div>
+
+<!-- STEP 3 -->
+<div id="step-3" class="step glass p-10 rounded-3xl text-center space-y-6">
+<h2 class="text-3xl text-gradient">Why That Mattered</h2>
+<p>Because family isn’t always about blood.</p>
+<button class="btn px-8 py-3 rounded-full bg-gradient-to-r from-pink-500 to-rose-600 text-white"
+onclick="nextStep('game')">One More Thing</button>
+</div>
+
+<!-- GAME -->
+<div id="step-game" class="step glass p-10 rounded-3xl text-center space-y-6">
+<h2 class="text-2xl text-gradient">Tap the cards</h2>
+<div class="grid grid-cols-3 gap-4 max-w-xs mx-auto">
+<div class="memory-card" data="🤍 Trust"></div>
+<div class="memory-card" data="🌿 Comfort"></div>
+<div class="memory-card" data="✨ Family"></div>
+</div>
+<p id="game-msg" class="opacity-0">Some bonds don’t need blood.</p>
+<button id="game-next" class="btn opacity-0 px-8 py-3 rounded-full bg-gradient-to-r from-pink-500 to-rose-600 text-white"
+onclick="nextStep('quiz')">Continue</button>
+</div>
+
+<!-- QUIZ -->
+<div id="step-quiz" class="step glass p-10 rounded-3xl text-center space-y-6">
+<h2 class="text-2xl text-gradient">What matters most?</h2>
+<button class="quiz-option w-full p-3 rounded-xl" onclick="selectQuiz(this)">Feeling safe</button>
+<button class="quiz-option w-full p-3 rounded-xl" onclick="selectQuiz(this)">Being there</button>
+<button class="quiz-option w-full p-3 rounded-xl" onclick="selectQuiz(this)">Choosing each other</button>
+<button id="quiz-next" class="btn opacity-0 px-8 py-3 rounded-full bg-gradient-to-r from-pink-500 to-rose-600 text-white"
+onclick="nextStep('line')">Continue</button>
+</div>
+
+<!-- TYPEWRITER -->
+<div id="step-line" class="step glass special-bg p-10 rounded-3xl text-center space-y-8">
+<p id="typewriter" class="text-2xl md:text-3xl min-h-[4rem]"></p>
+<button id="line-next" class="btn opacity-0 px-8 py-3 rounded-full bg-gradient-to-r from-pink-500 to-rose-600 text-white"
+onclick="nextStep(4)">Continue</button>
+</div>
+
+<!-- REMEMBER -->
+<div id="step-4" class="step glass p-10 rounded-3xl text-center space-y-4">
+<h2 class="text-2xl text-gradient">Things I Want You To Remember</h2>
+<p>You don’t have to be strong all the time.</p>
+<p>You don’t owe anyone explanations.</p>
+<p>You matter — even on quiet days.</p>
+<button class="btn px-8 py-3 rounded-full bg-gradient-to-r from-pink-500 to-rose-600 text-white"
+onclick="nextStep(5)">Continue</button>
+</div>
+
+<!-- GALLERY -->
+<div id="step-5" class="step glass p-10 rounded-3xl text-center space-y-6">
+<h2 class="text-2xl text-gradient">Moments</h2>
+<div class="gallery">
+<img src="images/sister1.jpg">
+<img src="images/sister2.jpg">
+<img src="images/sister3.jpg">
+<img src="images/sister4.jpg">
+</div>
+<button class="btn px-8 py-3 rounded-full bg-gradient-to-r from-pink-500 to-rose-600 text-white"
+onclick="nextStep(6)">One More</button>
+</div>
+
+<!-- NOTE -->
+<div id="step-6" class="step glass p-10 rounded-3xl text-center space-y-6">
+<h2 class="text-2xl text-gradient">If You Ever Forget</h2>
+<p>If you ever feel overwhelmed or unsure, remember there is someone who is always quietly on your side.</p>
+<button class="btn px-8 py-3 rounded-full bg-gradient-to-r from-pink-500 to-rose-600 text-white"
+onclick="nextStep(7)">Continue</button>
+</div>
+
+<!-- PROMISE -->
+<div id="step-7" class="step glass p-10 rounded-3xl text-center space-y-6">
+<h2 class="text-2xl text-gradient">A Promise</h2>
+<button class="btn px-8 py-3 rounded-full bg-gradient-to-r from-pink-500 to-rose-600 text-white"
+onclick="this.innerText='And I promise too.'">I promise to be there</button>
+<button class="btn mt-4 px-8 py-3 rounded-full bg-gradient-to-r from-pink-500 to-rose-600 text-white"
+onclick="nextStep(8)">Continue</button>
+</div>
+
+<!-- END -->
+<div id="step-8" class="step glass p-10 rounded-3xl text-center space-y-6">
+<h2 class="text-3xl text-gradient">Thank You</h2>
+<p>This isn’t the end of anything.</p>
+<p class="italic">It’s just something I wanted you to have. 🤍</p>
+</div>
+
+</div>
+</div>
+
+<script>
+let current=1;
+
+function typeText(el,speed=30){
+  const t=el.innerText;
+  el.innerText="";
+  let i=0;
+  (function type(){
+    if(i<t.length){el.innerText+=t[i++];setTimeout(type,speed)}
+  })();
+}
+
+function nextStep(n){
+  document.querySelectorAll(".step").forEach(s=>s.classList.remove("active","special-bg"));
+  const step=document.getElementById("step-"+n);
+  step.classList.add("active");
+  step.querySelectorAll("h1,h2,p").forEach(el=>{
+    el.classList.add("typing");
+    typeText(el);
+  });
+  if(n==='line'){step.classList.add("special-bg");playType()}
+  if(n===5)animateGallery();
+}
+
+function startMusic(){
+  const m=document.getElementById("bg-music");
+  m.volume=.25;m.play()
+}
+
+/* Game FIXED */
+let r=0;
+document.querySelectorAll(".memory-card").forEach(c=>{
+  c.onclick=()=>{
+    if(c.classList.contains("revealed"))return;
+    c.classList.add("revealed");
+    c.textContent=c.getAttribute("data");
+    r++;
+    if(r===3){
+      document.getElementById("game-msg").style.opacity=1;
+      document.getElementById("game-next").style.opacity=1;
+    }
+  }
+});
+
+/* Quiz */
+function selectQuiz(el){
+  document.querySelectorAll(".quiz-option").forEach(b=>b.classList.remove("selected"));
+  el.classList.add("selected");
+  document.getElementById("quiz-next").style.opacity=1;
+}
+
+/* Typewriter main line */
+function playType(){
+  const t=document.getElementById("typewriter");
+  const btn=document.getElementById("line-next");
+  const a="I might not be your only brother, or even the best one…";
+  const b="but you are my best sister.";
+  t.innerText="";btn.style.opacity=0;
+  let i=0,j=0;
+  (function w1(){
+    if(i<a.length){t.innerText+=a[i++];setTimeout(w1,60)}
+    else{t.innerText+="\n";setTimeout(w2,500)}
+  })();
+  function w2(){
+    if(j<b.length){t.innerText+=b[j++];setTimeout(w2,70)}
+    else{btn.style.opacity=1}
+  }
+}
+
+/* Gallery animation */
+function animateGallery(){
+  document.querySelectorAll(".gallery img").forEach((img,i)=>{
+    setTimeout(()=>img.classList.add("show"),i*250)
+  });
+}
+</script>
+</body>
+</html>
